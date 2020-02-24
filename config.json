@@ -1,0 +1,11 @@
+{
+  "debug": false,
+  "server": {
+    "address": ":6754"
+  },
+  "redis": {
+    "address": "localhost:6379",
+    "password": "",
+    "db": 0
+  }
+}
