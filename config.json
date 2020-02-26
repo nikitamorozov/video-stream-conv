@@ -1,7 +1,11 @@
 {
   "debug": false,
   "server": {
+    "domain": "http://video.club500.com/",
     "address": ":6754"
+  },
+  "converter": {
+    "postfix": "_playlist.m3u8"
   },
   "redis": {
     "address": "localhost:6379",

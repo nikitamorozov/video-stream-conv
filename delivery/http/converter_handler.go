@@ -13,11 +13,14 @@ import (
 
 type ConverterHandler struct {
 	converterUseCases usecase.ConverterUseCases
+	domain            string
+	filePostfix       string
 }
 
 func (handler *ConverterHandler) Convert(c echo.Context) error {
-	destFileName := tools.HashGenerator()
-	sourceFileName := "source-" + destFileName
+	hash := tools.HashGenerator()
+	destFileName := "video/" + hash
+	sourceFileName := "video/source_" + hash + ".mp4"
 
 	// Source
 	file, err := c.FormFile("file")
@@ -44,7 +47,7 @@ func (handler *ConverterHandler) Convert(c echo.Context) error {
 	}
 
 	resp := response.ConvertResponse{
-		Dest: destFileName,
+		Dest: handler.domain + hash + handler.filePostfix,
 	}
 
 	go handler.converterUseCases.ConvertVideo(sourceFileName, destFileName)
@@ -52,9 +55,11 @@ func (handler *ConverterHandler) Convert(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func NewConverterHttpHandler(e *echo.Echo, converterUseCases usecase.ConverterUseCases) {
+func NewConverterHttpHandler(e *echo.Echo, converterUseCases usecase.ConverterUseCases, domain string, filePostfix string) {
 	handler := ConverterHandler{
 		converterUseCases: converterUseCases,
+		domain:            domain,
+		filePostfix:       filePostfix,
 	}
 
 	e.GET(common.API_VER_1_0+"/convert", handler.Convert)

@@ -1,0 +1,42 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jrottenberg/ffmpeg:4.1-ubuntu
+    container_name: app
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "6754:6754"
+    working_dir: /var/app
+    entrypoint: /bin/bash
+    volumes:
+      - ./video:/var/app/video
+    networks:
+      - app-network
+
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./video:/var/app/video
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+
+#Volumes
+volumes:
+  dbdata:
+    driver: local

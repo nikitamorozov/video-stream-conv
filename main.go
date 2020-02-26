@@ -1,10 +1,9 @@
-package video_stream_conv
+package main
 
 import (
 	"fmt"
 	"github.com/nikitamorozov/video-stream-conv/delivery/http"
 	"github.com/nikitamorozov/video-stream-conv/usecase"
-
 	//"github.com/go-redis/redis"
 	"github.com/labstack/echo"
 	cfg "github.com/nikitamorozov/video-stream-conv/config/env"
@@ -19,6 +18,8 @@ func init() {
 }
 
 func main() {
+	domain := config.GetString(`server.domain`)
+	postfix := config.GetString(`converter.postfix`)
 	//redisAddress := config.GetString(`redis.address`)
 	//redisPassword := config.GetString(`redis.password`)
 	//redisDb := config.GetInt(`redis.db`)
@@ -34,13 +35,12 @@ func main() {
 	e := echo.New()
 	middL := middleware.InitMiddleware()
 	e.Use(middL.CORS)
-	e.Use(middL.CheckToken)
 
 	// Use cases layer
 	useCase := usecase.NewConverterUseCases()
 
 	// Delivery layer
-	http.NewConverterHttpHandler(e, useCase)
+	http.NewConverterHttpHandler(e, useCase, domain, postfix)
 
 	_ = e.Start(config.GetString("server.address"))
 }
