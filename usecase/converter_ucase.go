@@ -12,7 +12,7 @@ type converterUseCases struct {
 }
 
 func (uc converterUseCases) ConvertVideo(source string, dest string) {
-	exec.Command("/bin/bash", "converter.sh", source, dest)
+	exec.Command("/bin/bash", "converter.sh", source, dest).Run()
 }
 
 func NewConverterUseCases() ConverterUseCases {
