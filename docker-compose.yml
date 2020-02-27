@@ -11,17 +11,19 @@ services:
     ports:
       - "6754:6754"
     working_dir: /var/app
-    entrypoint: /bin/bash
+    entrypoint: ./video-stream-conv
     volumes:
       - ./video:/var/app/video
     networks:
       - app-network
 
   webserver:
-    image: nginx:alpine
+    image: nginx:stable-alpine
     container_name: webserver
     restart: unless-stopped
     tty: true
+    depends_on:
+      - app
     ports:
       - "80:80"
       - "443:443"

@@ -11,4 +11,5 @@ COPY ./config.json /var/app
 COPY ./video-stream-conv /var/app
 COPY converter.sh /var/app
 
+EXPOSE 6754
 ENTRYPOINT "./video-stream-conv"
