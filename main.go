@@ -2,45 +2,42 @@ package main
 
 import (
 	"fmt"
-	"github.com/nikitamorozov/video-stream-conv/delivery/http"
-	"github.com/nikitamorozov/video-stream-conv/usecase"
-	//"github.com/go-redis/redis"
 	"github.com/labstack/echo"
 	cfg "github.com/nikitamorozov/video-stream-conv/config/env"
 	"github.com/nikitamorozov/video-stream-conv/config/middleware"
+	"github.com/nikitamorozov/video-stream-conv/delivery/http"
+	"github.com/nikitamorozov/video-stream-conv/repository"
+	"github.com/nikitamorozov/video-stream-conv/usecase"
+	"github.com/streadway/amqp"
 )
 
-var config cfg.Config
+var configMain cfg.Config
 
 func init() {
-	config = cfg.NewViperConfig()
+	configMain = cfg.NewViperConfig()
 	fmt.Println("Request tool started")
 }
 
 func main() {
-	domain := config.GetString(`server.domain`)
-	postfix := config.GetString(`converter.postfix`)
-	//redisAddress := config.GetString(`redis.address`)
-	//redisPassword := config.GetString(`redis.password`)
-	//redisDb := config.GetInt(`redis.db`)
-	//
-	//redisClient := redis.NewClient(&redis.Options{
-	//	Addr:     redisAddress,
-	//	Password: redisPassword,
-	//	DB:       redisDb,
-	//})
-
-	//redisClient.Get().
+	domain := configMain.GetString(`server.domain`)
+	postfix := configMain.GetString(`converter.postfix`)
+	connection := configMain.GetString(`amqp`)
+	queueName := configMain.GetString(`queue.name`)
 
 	e := echo.New()
 	middL := middleware.InitMiddleware()
 	e.Use(middL.CORS)
 
-	// Use cases layer
-	useCase := usecase.NewConverterUseCases()
+	conn, err := amqp.Dial(connection)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 
-	// Delivery layer
-	http.NewConverterHttpHandler(e, useCase, domain, postfix)
+	repo := repository.NewQueueRepository(conn)
+	uc := usecase.NewQueueUseCases(repo)
 
-	_ = e.Start(config.GetString("server.address"))
+	http.NewManagerHttpHandler(e, queueName, uc, domain, postfix)
+
+	_ = e.Start(configMain.GetString("server.address"))
 }

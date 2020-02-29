@@ -7,9 +7,8 @@
   "converter": {
     "postfix": "_playlist.m3u8"
   },
-  "redis": {
-    "address": "localhost:6379",
-    "password": "",
-    "db": 0
+  "amqp": "amqp://guest:guest@rabbit1:5672/",
+  "queue": {
+    "name": "converter"
   }
 }

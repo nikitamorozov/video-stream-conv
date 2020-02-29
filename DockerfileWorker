@@ -1,0 +1,12 @@
+FROM jrottenberg/ffmpeg:4.1-ubuntu
+
+MAINTAINER Nikita Morozov <morozov.nikita@me.com>
+
+RUN apt-get install -y bc
+
+WORKDIR /var/app
+COPY ./config.json /var/app
+COPY ./worker /var/app
+COPY converter.sh /var/app
+
+ENTRYPOINT "./worker"
