@@ -70,5 +70,5 @@ func NewManagerHttpHandler(e *echo.Echo, queue string, queueUseCases usecase.Que
 		filePostfix:   filePostfix,
 	}
 
-	e.GET(common.API_VER_1_0+"/convert", handler.Convert)
+	e.POST(common.API_VER_1_0+"/convert", handler.Convert)
 }
